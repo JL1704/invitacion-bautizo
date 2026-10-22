@@ -1,0 +1,288 @@
+---
+// ✏️ Edita aquí tus datos
+const fondo = "/images/fondo-hero2.jpg";
+
+const lugares = [
+  {
+    icono: "iglesia",
+    titulo: "Ceremonia",
+    hora: "4:00 PM",
+    lugar: "Parroquia de San José Obrero",
+    direccion: "Dirección del lugar de la Ceremonia",
+    urlMapa: "https://maps.app.goo.gl/ZH7fwuuk8oFbgtcz6?g_st=aw",
+    imagen: "/images/ceremonia.jpg",
+  },
+  {
+    icono: "pastel",
+    titulo: "Evento",
+    hora: "6:00 PM",
+    lugar: "Ilusiones Eventos",
+    direccion: "Dirección del lugar del Evento",
+    urlMapa: "https://maps.app.goo.gl/z4RuAZspd4oFcV1E8?g_st=aw",
+    imagen: "/images/evento.png",
+  },
+];
+
+---
+
+<section class="te-esperamos" data-parallax-section>
+  <div
+    class="te-esperamos__bg"
+    data-parallax-bg
+    style={`background-image: url('${fondo}')`}
+  >
+  </div>
+
+  <div class="contenedor">
+    <h2 class="titulo anim anim--arriba">Te Esperamos</h2>
+
+    <div class="cards">
+      {
+        lugares.map((l, i) => (
+          <article class={`card anim ${i % 2 === 0 ? "anim--izq" : "anim--der"}`}>
+            <img class="card__img" src={l.imagen} alt={l.titulo} loading="lazy" />
+
+            {l.icono === "iglesia" ? (
+              <svg class="icono" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+                <path d="M32 4v10M27 9h10" />
+                <path d="M20 28 32 14l12 14v30H20z" />
+                <path d="M8 58V38l12-8M56 58V38l-12-8" />
+                <path d="M26 58V44a6 6 0 0 1 12 0v14" />
+                <path d="M4 58h56" />
+              </svg>
+            ) : (
+              <svg class="icono" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+                <path d="M32 16c-6-8-14-1-8 5l8 7 8-7c6-6-2-13-8-5z" />
+                <path d="M32 28v6" />
+                <path d="M18 34h28v10H18z" />
+                <path d="M10 44h44v14H10z" />
+              </svg>
+            )}
+
+            <h3 class="card__titulo">{l.titulo}</h3>
+            <p class="card__hora">{l.hora}</p>
+            <p class="card__lugar">{l.lugar}</p>
+            <p class="card__direccion">{l.direccion}</p>
+
+            <a
+              class="boton"
+              href={l.urlMapa}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Ver ubicación
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .te-esperamos {
+    --dorado: #c99a62;
+    --dorado-claro: #e0b36d;
+    --rosa: #ff5a7a;
+    --blanco:rgb(250, 234, 237);
+    position: relative;
+    overflow: hidden;
+    padding: 4rem 1.25rem 5rem;
+    background: #fde6ea;
+  }
+
+  /* Capa de fondo con parallax (más grande que la sección) */
+  .te-esperamos__bg {
+    position: absolute;
+    top: -25%;
+    bottom: -25%;
+    left: 0;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-image: linear-gradient(160deg, #fff5f7, #ffd9df);
+    will-change: transform;
+    z-index: 0;
+  }
+
+  .contenedor {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .titulo {
+    margin: 0 0 2.5rem;
+    text-align: center;
+    font-family: "Parisienne", cursive;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 7vw, 3.2rem);
+    color: var(--blanco);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    align-items: stretch;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0.5rem 0.5rem 2rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 10px 35px rgba(240, 71, 95, 0.12);
+    font-family: "Cormorant Garamond", serif;
+    color: #2d3448;
+  }
+
+  .card__img {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: 16px;
+    background: #f6d5db;
+  }
+
+  .icono {
+    width: 56px;
+    height: 56px;
+    margin-top: 1.5rem;
+    color: var(--dorado);
+  }
+
+  .card__titulo {
+    margin: 1rem 0 0.8rem;
+    font-weight: 400;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--dorado-claro);
+  }
+
+  .card__hora {
+    margin: 0 0 0.6rem;
+    font-weight: 600;
+    font-size: 1.2rem;
+  }
+
+  .card__lugar {
+    margin: 0 0 1rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+  }
+
+  .card__direccion {
+    margin: 0 1rem 1.8rem;
+    font-size: 1.05rem;
+    color: #6b7280;
+  }
+
+  .boton {
+    margin-top: auto;
+    padding: 0.6rem 1.6rem;
+    border-radius: 3px;
+    background: var(--dorado);
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .boton:hover {
+    background: #b3844e;
+    transform: translateY(-2px);
+  }
+
+  /* ---- Transiciones de entrada ---- */
+  .anim {
+    opacity: 0;
+    transition:
+      opacity 1s ease-out var(--delay, 0s),
+      transform 1s ease-out var(--delay, 0s);
+  }
+  .anim--arriba {
+    transform: translateY(-30px);
+  }
+  .anim--izq {
+    transform: translateX(-80px);
+  }
+  .anim--der {
+    transform: translateX(80px);
+    --delay: 0.2s;
+  }
+  .anim.activo {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 720px) {
+    .cards {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anim {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // 1) Entrada de textos y cards
+  const elementos = document.querySelectorAll(".te-esperamos .anim");
+  const observer = new IntersectionObserver(
+    (entradas) => {
+      entradas.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add("activo");
+          observer.unobserve(e.target);
+        }
+      });
+    },
+    { threshold: 0.2 }
+  );
+  elementos.forEach((el) => observer.observe(el));
+
+  // 2) Parallax del fondo (relativo a la posición de la sección)
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const seccion = document.querySelector<HTMLElement>("[data-parallax-section]");
+  const fondo = document.querySelector<HTMLElement>("[data-parallax-bg]");
+  const VELOCIDAD = 0.2;
+  let ticking = false;
+
+  function actualizar() {
+    if (seccion && fondo) {
+      const r = seccion.getBoundingClientRect();
+      // Solo mientras la sección es visible
+      if (r.bottom > 0 && r.top < window.innerHeight) {
+        const distancia = r.top + r.height / 2 - window.innerHeight / 2;
+        fondo.style.transform = `translate3d(0, ${-distancia * VELOCIDAD}px, 0)`;
+      }
+    }
+    ticking = false;
+  }
+
+  if (!reduceMotion) {
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!ticking) {
+          requestAnimationFrame(actualizar);
+          ticking = true;
+        }
+      },
+      { passive: true }
+    );
+    actualizar();
+  }
+</script>

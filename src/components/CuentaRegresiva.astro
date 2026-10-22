@@ -1,0 +1,196 @@
+---
+// ✏️ Edita aquí tus datos
+const datos = {
+  titulo: "¡Falta Poco!",
+  tituloFinal: "¡Hoy es el gran día!",
+  // Fecha y hora de la ceremonia (-06:00 = hora del centro de México)
+  fecha: "2026-11-07T17:00:00-04:00",
+  imagen: "/images/paloma-flores.png",
+};
+
+const unidades = [
+  { id: "dias", etiqueta: "Días" },
+  { id: "horas", etiqueta: "Horas" },
+  { id: "minutos", etiqueta: "Minutos" },
+  { id: "segundos", etiqueta: "Segundos" },
+];
+---
+
+<section
+  class="cuenta"
+  data-fecha={datos.fecha}
+  data-titulo-final={datos.tituloFinal}
+>
+  <div class="contenedor">
+    <h2 class="titulo anim anim--arriba" data-titulo>{datos.titulo}</h2>
+
+    <div class="tarjetas">
+      {
+        unidades.map((u, i) => (
+          <div class="tarjeta anim anim--arriba" style={`--delay: ${0.15 * (i + 1)}s`}>
+            <span class="numero" data-unidad={u.id}>00</span>
+            <span class="etiqueta">{u.etiqueta}</span>
+          </div>
+        ))
+      }
+    </div>
+
+    <img
+      class="ornamento anim anim--zoom"
+      style="--delay: 0.8s"
+      src={datos.imagen}
+      alt="Paloma y flores"
+      loading="lazy"
+    />
+  </div>
+</section>
+
+<style>
+  .cuenta {
+    --rosa: #f0475f;
+    --beige: #b3996d;
+    background: #ffb0b3;
+    padding: 6rem 1.25rem;
+    overflow: hidden;
+  }
+
+  .contenedor {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+  }
+
+  .titulo {
+    margin: 0;
+    font-family: "Parisienne", cursive;
+    font-weight: 400;
+    font-size: clamp(2.6rem, 9vw, 4rem);
+    color: var(--rosa);
+    text-align: center;
+  }
+
+  .tarjetas {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+  }
+
+  .tarjeta {
+    aspect-ratio: 1 / 1.05;
+    background: #fff4f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2.2rem 0.5rem 1.2rem;
+    box-shadow: 0 8px 25px rgba(240, 71, 95, 0.12);
+  }
+
+  .numero {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 400;
+    font-size: clamp(2.4rem, 8vw, 4.5rem);
+    line-height: 1;
+    color: var(--rosa);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .etiqueta {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+    color: var(--beige);
+  }
+
+  .ornamento {
+    width: min(60%, 300px);
+    height: auto;
+  }
+
+  /* ---- Transiciones de entrada ---- */
+  .anim {
+    opacity: 0;
+    transition:
+      opacity 0.9s ease-out var(--delay, 0s),
+      transform 0.9s ease-out var(--delay, 0s);
+  }
+  .anim--arriba {
+    transform: translateY(40px);
+  }
+  .anim--zoom {
+    transform: scale(0.8);
+  }
+  .anim.activo {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 520px) {
+    .tarjetas {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anim {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const seccion = document.querySelector<HTMLElement>(".cuenta");
+
+  if (seccion) {
+    // 1) Entrada animada
+    const observer = new IntersectionObserver(
+      (entradas) => {
+        entradas.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("activo");
+            observer.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+    seccion.querySelectorAll(".anim").forEach((el) => observer.observe(el));
+
+    // 2) Cuenta regresiva
+    const objetivo = new Date(seccion.dataset.fecha ?? "").getTime();
+    const tituloEl = seccion.querySelector<HTMLElement>("[data-titulo]");
+    const el = (id: string) => seccion.querySelector<HTMLElement>(`[data-unidad="${id}"]`);
+    const pad = (n: number) => String(n).padStart(2, "0");
+
+    function actualizar() {
+      let diff = objetivo - Date.now();
+
+      if (Number.isNaN(objetivo)) return;
+
+      if (diff <= 0) {
+        diff = 0;
+        if (tituloEl) tituloEl.textContent = seccion!.dataset.tituloFinal ?? "";
+        clearInterval(intervalo);
+      }
+
+      const segundosTotales = Math.floor(diff / 1000);
+      const dias = Math.floor(segundosTotales / 86400);
+      const horas = Math.floor((segundosTotales % 86400) / 3600);
+      const minutos = Math.floor((segundosTotales % 3600) / 60);
+      const segundos = segundosTotales % 60;
+
+      el("dias")!.textContent = pad(dias);
+      el("horas")!.textContent = pad(horas);
+      el("minutos")!.textContent = pad(minutos);
+      el("segundos")!.textContent = pad(segundos);
+    }
+
+    const intervalo = setInterval(actualizar, 1000);
+    actualizar();
+  }
+</script>

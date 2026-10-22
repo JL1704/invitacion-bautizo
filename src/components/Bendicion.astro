@@ -1,0 +1,182 @@
+---
+// ✏️ Edita aquí tus datos
+const datos = {
+  nombre: "Lucia Calderon Cortez",
+  mensaje:
+    "El amor y la alegría de este día marcarán el inicio de una vida guiada por la fe. ¡Ven a celebrar el bautizo de",
+  imagen: "/images/paloma-flores.png",
+  padres: {
+    titulo: "Con la bendición de Mis Padres:",
+    madre: "Mariana Ivonne Cortez García",
+    padre: "Luis Genaro Calderon Galarza",
+  },
+  padrinos: {
+    titulo: "Y Mis Padrinos:",
+    madre: "Benita Cortez García",
+    padre: "Juan Jose Lopez Hernández",
+  },
+  titulo: "Mi Bautizo",
+  fecha: "07 | 11 | 26",
+};
+---
+
+<section class="bendicion" id="siguiente">
+  <div class="contenedor">
+    <p class="mensaje reveal">
+      {datos.mensaje} {datos.nombre}!
+    </p>
+
+    <img
+      class="ornamento reveal reveal--zoom"
+      src={datos.imagen}
+      alt="Paloma y flores"
+      loading="lazy"
+    />
+
+    <div class="bloque reveal">
+      <h3 class="subtitulo">{datos.padres.titulo}</h3>
+      <p class="persona">{datos.padres.madre}</p>
+      <p class="y">&amp;</p>
+      <p class="persona">{datos.padres.padre}</p>
+    </div>
+
+    <div class="bloque reveal" style="--delay: 0.15s">
+      <h3 class="subtitulo">{datos.padrinos.titulo}</h3>
+      <p class="persona">{datos.padrinos.madre}</p>
+      <p class="y">&amp;</p>
+      <p class="persona">{datos.padrinos.padre}</p>
+    </div>
+
+    <div class="final">
+      <h2 class="titulo reveal">
+        {datos.titulo}<br />{datos.nombre}
+      </h2>
+      <p class="fecha reveal" style="--delay: 0.2s">{datos.fecha}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .bendicion {
+    --azul: #4a6382;
+    --rosa: #ff5a7a;
+    background: #fff0f3;
+    padding: 5rem 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .contenedor {
+    width: 100%;
+    max-width: 520px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3.5rem;
+  }
+
+  .mensaje {
+    margin: 0;
+    font-family: "Parisienne", cursive;
+    font-size: clamp(1.4rem, 5vw, 1.9rem);
+    line-height: 1.5;
+    color: var(--azul);
+  }
+
+  .ornamento {
+    width: min(70%, 260px);
+    height: auto;
+  }
+
+  .bloque {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .subtitulo {
+    margin: 0 0 1rem;
+    font-family: "Parisienne", cursive;
+    font-weight: 400;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    color: var(--rosa);
+  }
+
+  .persona {
+    margin: 0;
+    font-family: "Raleway", sans-serif;
+    font-size: clamp(1.05rem, 3.5vw, 1.3rem);
+    color: var(--azul);
+  }
+
+  .y {
+    margin: 0.1rem 0;
+    font-family: "Raleway", sans-serif;
+    color: var(--azul);
+  }
+
+  .final {
+    margin-top: 1.5rem;
+  }
+
+  .titulo {
+    margin: 0;
+    font-family: "Great Vibes", cursive;
+    font-weight: 400;
+    font-size: clamp(3rem, 12vw, 4.5rem);
+    line-height: 1.2;
+    color: var(--rosa);
+  }
+
+  .fecha {
+    margin: 2rem 0 0;
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    font-size: clamp(1.6rem, 6vw, 2.2rem);
+    letter-spacing: 0.1em;
+    color: var(--azul);
+  }
+
+  /* ---- Transiciones de entrada ---- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition:
+      opacity 0.9s ease-out var(--delay, 0s),
+      transform 0.9s ease-out var(--delay, 0s);
+  }
+  .reveal--zoom {
+    transform: scale(0.8);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const elementos = document.querySelectorAll(".reveal");
+
+  const observer = new IntersectionObserver(
+    (entradas) => {
+      entradas.forEach((entrada) => {
+        if (entrada.isIntersecting) {
+          entrada.target.classList.add("visible");
+          observer.unobserve(entrada.target); // solo anima una vez
+        }
+      });
+    },
+    { threshold: 0.2 }
+  );
+
+  elementos.forEach((el) => observer.observe(el));
+</script>

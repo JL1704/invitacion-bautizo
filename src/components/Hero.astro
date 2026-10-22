@@ -1,0 +1,204 @@
+---
+// ✏️ Edita aquí tus datos
+const datos = {
+  titulo: "Acompáñanos al bautizo",
+  subtitulo: "de nuestra hija",
+  nombre: "Lucia",
+  fecha: "07 . 11 . 26",
+  fondo: "/images/fondo-hero3.jpg",
+};
+---
+
+<section class="hero" id="inicio">
+  <!-- Capa de fondo (se mueve más lento que el scroll) -->
+  <div
+    class="hero__bg"
+    data-speed="0.35"
+    style={`background-image: url('${datos.fondo}')`}
+  >
+  </div>
+
+  <!-- Contenido -->
+  <div class="hero__content" data-hero-content>
+    <div class="circulo" data-speed="0.08">
+      <svg class="cruz" viewBox="0 0 100 140" aria-hidden="true">
+        <path
+          d="M42 8 h16 v34 h30 v16 h-30 v74 h-16 v-74 h-30 v-16 h30 z"
+          fill="#fde6ea"
+          stroke="#fff"
+          stroke-opacity=".6"
+          stroke-width="2"
+        />
+      </svg>
+
+      <p class="titulo">{datos.titulo}</p>
+      <p class="subtitulo">{datos.subtitulo}</p>
+      <h1 class="nombre">{datos.nombre}</h1>
+      <p class="fecha">{datos.fecha}</p>
+    </div>
+  </div>
+
+  <a href="#siguiente" class="scroll-hint" aria-label="Deslizar hacia abajo">
+    <span></span>
+  </a>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    height: 100svh;
+    min-height: 600px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+
+  /* Más alto que la sección para que no se vean huecos al moverse */
+  .hero__bg {
+    position: absolute;
+    top: -40%;
+    left: 0;
+    width: 100%;
+    height: 140%;
+    background-color: #fde6ea;
+    background-image: linear-gradient(160deg, #fff5f7, #ffd9df);
+    background-size: cover;
+    background-position: center;
+    will-change: transform;
+    z-index: 0;
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 1;
+    will-change: transform, opacity;
+  }
+
+  .circulo {
+    width: min(82vw, 520px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--rosa-circulo);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    box-shadow: 0 20px 60px rgba(240, 71, 95, 0.2);
+    animation: aparecer 1.2s ease-out both;
+  }
+
+  .cruz {
+    width: clamp(40px, 8vw, 64px);
+    margin-bottom: 1.2rem;
+    filter: drop-shadow(0 2px 4px rgba(240, 71, 95, 0.25));
+  }
+
+  .titulo {
+    margin: 0;
+    font-weight: 700;
+    font-size: clamp(0.9rem, 2.6vw, 1.35rem);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .subtitulo {
+    margin: 0.3rem 0 0;
+    font-size: clamp(0.6rem, 1.6vw, 0.8rem);
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    opacity: 0.85;
+  }
+
+  .nombre {
+    margin: 0;
+    font-family: "Great Vibes", cursive;
+    font-weight: 400;
+    font-size: clamp(4.5rem, 16vw, 8rem);
+    line-height: 1.1;
+  }
+
+  .fecha {
+    margin: 0.5rem 0 0;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    font-size: clamp(0.9rem, 2.4vw, 1.2rem);
+  }
+
+  /* Indicador de scroll */
+  .scroll-hint {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    width: 26px;
+    height: 44px;
+    border: 2px solid var(--rosa-texto);
+    border-radius: 20px;
+  }
+  .scroll-hint span {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 4px;
+    height: 8px;
+    margin-left: -2px;
+    border-radius: 2px;
+    background: var(--rosa-texto);
+    animation: scroll 1.6s infinite;
+  }
+
+  @keyframes scroll {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(16px); }
+  }
+  @keyframes aparecer {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .circulo, .scroll-hint span { animation: none; }
+  }
+</style>
+
+<script>
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const capas = document.querySelectorAll<HTMLElement>("[data-speed]");
+  const contenido = document.querySelector<HTMLElement>("[data-hero-content]");
+  let ticking = false;
+
+  function actualizar() {
+    const y = window.scrollY;
+    const alto = window.innerHeight;
+
+    // Solo animamos mientras el hero es visible
+    if (y <= alto * 1.2) {
+      capas.forEach((el) => {
+        const velocidad = parseFloat(el.dataset.speed || "0");
+        el.style.transform = `translate3d(0, ${y * velocidad}px, 0)`;
+      });
+
+      if (contenido) {
+        contenido.style.opacity = String(Math.max(0, 1 - y / (alto * 0.8)));
+      }
+    }
+    ticking = false;
+  }
+
+  if (!reduceMotion) {
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!ticking) {
+          requestAnimationFrame(actualizar);
+          ticking = true;
+        }
+      },
+      { passive: true }
+    );
+    actualizar();
+  }
+</script>

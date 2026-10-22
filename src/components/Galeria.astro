@@ -1,0 +1,234 @@
+---
+// ✏️ Edita aquí tus datos
+const datos = {
+  titulo: "Mi Galería", // déjalo vacío ("") si no quieres título
+  fondo: "/images/fondo-hero2.jpg",
+  fotos: [
+    { src: "/images/galeria-1.jpeg", alt: "Foto 1" },
+    { src: "/images/galeria-2.jpeg", alt: "Foto 2" },
+    { src: "/images/galeria-3.jpeg", alt: "Foto 3" },
+    { src: "/images/galeria-4.jpeg", alt: "Foto 4" },
+  ],
+};
+---
+
+<section class="galeria" data-parallax-section>
+  <div
+    class="galeria__bg"
+    data-parallax-bg
+    style={`background-image: url('${datos.fondo}')`}
+  >
+  </div>
+
+  <div class="contenedor">
+    {datos.titulo && <h2 class="titulo anim anim--arriba">{datos.titulo}</h2>}
+
+    <div class="collage">
+      {
+        datos.fotos.map((f, i) => (
+          <button
+            type="button"
+            class={`foto foto--${i + 1} anim`}
+            data-src={f.src}
+            data-alt={f.alt}
+            aria-label={`Ampliar: ${f.alt}`}
+          >
+            <img src={f.src} alt={f.alt} loading="lazy" />
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- Visor para ampliar la foto -->
+  <dialog class="visor" aria-label="Foto ampliada">
+    <img class="visor__img" src="" alt="" />
+  </dialog>
+</section>
+
+<style>
+  .galeria {
+    --fila: clamp(52px, 12vw, 108px);
+    --espacio: clamp(8px, 1.6vw, 14px);
+    position: relative;
+    overflow: hidden;
+    padding: 4rem 1rem 5rem;
+    background: #fde6ea;
+  }
+
+  /* Fondo con parallax (más grande que la sección) */
+  .galeria__bg {
+    position: absolute;
+    top: -25%;
+    bottom: -25%;
+    left: 0;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-image: linear-gradient(160deg, #fff5f7, #ffd9df);
+    will-change: transform;
+    z-index: 0;
+  }
+
+  .contenedor {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .titulo {
+    margin: 0 0 2rem;
+    text-align: center;
+    font-family: "Parisienne", cursive;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 7vw, 3.2rem);
+    color: #ffffff;
+  }
+
+  /* Collage: 2 columnas, 6 filas */
+  .collage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: var(--fila);
+    gap: var(--espacio);
+  }
+
+  .foto {
+    position: relative;
+    padding: 0;
+    border: 5px solid #fff;
+    background: #f6d5db;
+    overflow: hidden;
+    cursor: zoom-in;
+    box-shadow: 0 10px 30px rgba(240, 71, 95, 0.18);
+  }
+  .foto img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .foto:hover img {
+    transform: scale(1.06);
+  }
+
+  .foto--1 { grid-column: 1; grid-row: 1 / span 3; }
+  .foto--2 { grid-column: 2; grid-row: 1 / span 2; }
+  .foto--3 { grid-column: 1; grid-row: 4 / span 3; }
+  .foto--4 { grid-column: 2; grid-row: 3 / span 4; }
+
+  /* ---- Transiciones de entrada ---- */
+  .anim {
+    opacity: 0;
+    transition:
+      opacity 0.9s ease-out var(--delay, 0s),
+      transform 0.9s ease-out var(--delay, 0s);
+  }
+  .anim--arriba { transform: translateY(-30px); }
+  .foto--1 { transform: translateX(-60px); }
+  .foto--2 { transform: translateX(60px); --delay: 0.15s; }
+  .foto--3 { transform: translateY(60px); --delay: 0.3s; }
+  .foto--4 { transform: translateY(60px); --delay: 0.45s; }
+
+  .anim.activo {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---- Visor ---- */
+  .visor {
+    padding: 0;
+    border: none;
+    background: transparent;
+    max-width: 92vw;
+    max-height: 92vh;
+    overflow: visible;
+  }
+  .visor::backdrop {
+    background: rgba(40, 20, 30, 0.8);
+  }
+  .visor__img {
+    display: block;
+    max-width: 92vw;
+    max-height: 90vh;
+    border: 6px solid #fff;
+    border-radius: 6px;
+    cursor: zoom-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anim {
+      opacity: 1;
+      transform: none !important;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const seccion = document.querySelector<HTMLElement>(".galeria");
+
+  if (seccion) {
+    // 1) Entrada animada
+    const observer = new IntersectionObserver(
+      (entradas) => {
+        entradas.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("activo");
+            observer.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    seccion.querySelectorAll(".anim").forEach((el) => observer.observe(el));
+
+    // 2) Parallax del fondo
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fondo = seccion.querySelector<HTMLElement>("[data-parallax-bg]");
+    const VELOCIDAD = 0.2;
+    let ticking = false;
+
+    function actualizar() {
+      if (fondo) {
+        const r = seccion!.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < window.innerHeight) {
+          const distancia = r.top + r.height / 2 - window.innerHeight / 2;
+          fondo.style.transform = `translate3d(0, ${-distancia * VELOCIDAD}px, 0)`;
+        }
+      }
+      ticking = false;
+    }
+
+    if (!reduceMotion) {
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (!ticking) {
+            requestAnimationFrame(actualizar);
+            ticking = true;
+          }
+        },
+        { passive: true }
+      );
+      actualizar();
+    }
+
+    // 3) Ampliar foto
+    const visor = seccion.querySelector<HTMLDialogElement>(".visor")!;
+    const visorImg = seccion.querySelector<HTMLImageElement>(".visor__img")!;
+
+    seccion.querySelectorAll<HTMLButtonElement>(".foto").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        visorImg.src = btn.dataset.src ?? "";
+        visorImg.alt = btn.dataset.alt ?? "";
+        visor.showModal();
+      });
+    });
+
+    // Cerrar al hacer clic en cualquier parte (Esc también funciona)
+    visor.addEventListener("click", () => visor.close());
+  }
+</script>
