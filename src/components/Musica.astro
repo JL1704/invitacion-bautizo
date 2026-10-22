@@ -1,0 +1,120 @@
+---
+// ✏️ Edita aquí tus datos
+const datos = {
+  archivo: "/audio/cancion.mpeg",
+  volumen: 0.6, // de 0 a 1
+  iniciarConPrimerToque: true, // arranca la música al primer clic/toque en la página
+};
+---
+
+<div class="musica-wrap" data-volumen={datos.volumen} data-auto={datos.iniciarConPrimerToque}>
+  <audio class="musica__audio" src={datos.archivo} loop preload="none"></audio>
+
+  <button
+    type="button"
+    class="musica"
+    aria-pressed="false"
+    aria-label="Reproducir música"
+  >
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M9 18V5l12-2v13" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="18" cy="16" r="3" />
+      <line class="tachado" x1="3" y1="3" x2="21" y2="21" />
+    </svg>
+  </button>
+</div>
+
+<style>
+  .musica {
+    position: fixed;
+    left: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 50;
+    width: 46px;
+    height: 46px;
+    border: none;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #e0a458;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, background 0.2s ease;
+    animation: pulso 2s infinite;
+  }
+  .musica:hover {
+    background: #c98d44;
+    transform: scale(1.08);
+  }
+
+  /* Pausada: línea tachada y pulso para llamar la atención */
+  .tachado {
+    opacity: 1;
+  }
+  .musica.sonando {
+    animation: none;
+  }
+  .musica.sonando .tachado {
+    opacity: 0;
+  }
+
+  @keyframes pulso {
+    0% { box-shadow: 0 0 0 0 rgba(224, 164, 88, 0.6); }
+    70% { box-shadow: 0 0 0 14px rgba(224, 164, 88, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(224, 164, 88, 0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .musica { animation: none; }
+  }
+</style>
+
+<script>
+  const wrap = document.querySelector<HTMLElement>(".musica-wrap");
+  const boton = document.querySelector<HTMLButtonElement>(".musica");
+  const audio = document.querySelector<HTMLAudioElement>(".musica__audio");
+
+  if (wrap && boton && audio) {
+    audio.volume = Number(wrap.dataset.volumen ?? 0.6);
+
+    // Sincroniza el botón con el estado real del audio
+    function actualizarBoton() {
+      const sonando = !audio!.paused;
+      boton!.classList.toggle("sonando", sonando);
+      boton!.setAttribute("aria-pressed", String(sonando));
+      boton!.setAttribute("aria-label", sonando ? "Pausar música" : "Reproducir música");
+    }
+    audio.addEventListener("play", actualizarBoton);
+    audio.addEventListener("pause", actualizarBoton);
+
+    const reproducir = () => audio.play().catch(() => {});
+
+    boton.addEventListener("click", () => {
+      if (audio.paused) reproducir();
+      else audio.pause();
+    });
+
+    // Arrancar con el primer toque/clic en cualquier parte
+    if (wrap.dataset.auto === "true") {
+      const primerToque = () => {
+        if (audio.paused) reproducir();
+      };
+      document.addEventListener("click", primerToque, { once: true });
+      document.addEventListener("touchend", primerToque, { once: true });
+      document.addEventListener("keydown", primerToque, { once: true });
+    }
+
+    // Pausar si el invitado cambia de pestaña o minimiza, y reanudar al volver
+    let estabaSonando = false;
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        estabaSonando = !audio.paused;
+        audio.pause();
+      } else if (estabaSonando) {
+        reproducir();
+      }
+    });
+  }
+</script>
