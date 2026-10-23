@@ -20,7 +20,12 @@ const lugares = [
     direccion: "Dirección del lugar del Evento",
     urlMapa: "https://maps.app.goo.gl/z4RuAZspd4oFcV1E8?g_st=aw",
     imagen: "/images/evento.png",
+    extras: [
+      { icono: "sobre", texto: "Lluvia de sobres" },
+      { icono: "regalo", texto: "Regalo" },
+    ],
   },
+  
 ];
 
 ---
@@ -62,9 +67,34 @@ const lugares = [
             <h3 class="card__titulo">{l.titulo}</h3>
             <p class="card__hora">{l.hora}</p>
             <p class="card__lugar">{l.lugar}</p>
-            <p class="card__direccion">{l.direccion}</p>
+                        <p class="card__direccion">{l.direccion}</p>
+
+            {l.extras && (
+              <ul class="extras">
+                {l.extras.map((e) => (
+                  <li class="extra">
+                    {e.icono === "sobre" ? (
+                      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+                        <rect x="8" y="14" width="48" height="36" rx="3" />
+                        <path d="M8 18l24 18 24-18" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+                        <rect x="10" y="26" width="44" height="12" rx="2" />
+                        <path d="M14 38v18h36V38" />
+                        <path d="M32 26v30" />
+                        <path d="M32 26c-4-10-16-12-16-5 0 5 10 5 16 5z" />
+                        <path d="M32 26c4-10 16-12 16-5 0 5-10 5-16 5z" />
+                      </svg>
+                    )}
+                    
+                  </li>
+                ))}
+              </ul>
+            )}
 
             <a
+              class="boton"
               class="boton"
               href={l.urlMapa}
               target="_blank"
@@ -181,6 +211,34 @@ const lugares = [
     margin: 0 1rem 1.8rem;
     font-size: 1.05rem;
     color: #6b7280;
+  }
+
+    .extras {
+    list-style: none;
+    margin: 0 0 1.8rem;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+  }
+
+  .extra {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 1rem;
+    color: #6b7280;
+  }
+
+  .extra svg {
+    width: 44px;
+    height: 44px;
+    color: var(--dorado);
+    transition: transform 0.3s ease;
+  }
+  .extra:hover svg {
+    transform: translateY(-4px) rotate(-5deg);
   }
 
   .boton {
